@@ -1,13 +1,20 @@
-console.log('starting a new year :)')
 const express = require('express');
+
+const connectDB =  require('../src/config/database')
 
 const app = express();
 
-// app.listen(3000)
-
-app.listen(4000,() => {
+connectDB()
+  .then(() => {
+    console.log("DB connected successfully");
+    app.listen(4000,() => {
     console.log('server is running on port 4000');
 })
+  })
+  .catch((err) => {
+    console.log("DB connecttion err:", err);
+    return err;
+  });
 
 // app.use('/hello/2', (req, res) => {
 //     res.send('Hello from Hello Page 2!');
@@ -33,13 +40,13 @@ app.listen(4000,() => {
 //     res.send('User POST route');
 // });
 
-app.get('/user',(req,res,next) => {
-    console.log('user console 1')
-    next()
-},(req,res,next) => {
-    console.log('user console 2');
-    next()
-},(req,res,next) => {
-    console.log('user console 3')
-    res.send('uuser consolle 3')
-})
+// app.get('/user',(req,res,next) => {
+//     console.log('user console 1')
+//     next()
+// },(req,res,next) => {
+//     console.log('user console 2');
+//     next()
+// },(req,res,next) => {
+//     console.log('user console 3')
+//     res.send('uuser consolle 3')
+// })
