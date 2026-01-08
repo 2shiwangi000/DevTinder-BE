@@ -1,20 +1,92 @@
-const express = require('express');
+const express = require("express");
 
-const connectDB =  require('../src/config/database')
+const connectDB = require("../src/config/database");
 
 const app = express();
+const User = require("./models/user");
 
 connectDB()
   .then(() => {
     console.log("DB connected successfully");
-    app.listen(4000,() => {
-    console.log('server is running on port 4000');
-})
+    app.listen(4000, () => {
+      console.log("server is running on port 4000");
+    });
   })
   .catch((err) => {
     console.log("DB connecttion err:", err);
     return err;
   });
+
+app.use(express.json());
+
+app.post("/signup", async (req, res) => {
+  const user = new User(req.body);
+  try {
+    await user.save();
+    res.send("User Added Successfully ( : )");
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+app.get("/user", async (req, res) => {
+  // const emailId = req.body.emailId;
+  console.log(req.params,req.query.name)
+  // try {
+  //   const users = await User.find({ emailId: emailId });
+  //   if (users.length > 0) {
+  //     res.send(users);
+  //   } else {
+  //     res.status(400).send("user not found");
+  //   }
+  // } catch (err) {
+  //   res.status(400).send(err, "something went wrong");
+  // }
+});
+
+app.get("/feed/all", async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (users.length > 0) {
+      res.send(users);
+    } else {
+      res.status(400).send("no data found");
+    }
+  } catch (err) {
+    res.status(400).send(err, "something went wrong");
+  }
+});
+
+app.delete("/delete", async (req, res) => {
+  try {
+    const id = req.body.id;
+    await User.findByIdAndDelete(id).then((responce) => {
+      if (responce) {
+        res.send("User deleted successfully");
+      } else {
+        res.status(404).send("somthing went wrong");
+      }
+    });
+  } catch (err) {
+    res.status(400).send(err, "something went wrong");
+  }
+});
+
+app.patch("/update/user", async (req, res) => {
+  try {
+    const id = req.body.id;
+    const data = req.body.data;
+    await User.findByIdAndUpdate(id, data).then((responce) => {
+      if (responce) {
+        res.send("User updated :>");
+      } else {
+        res.status(400).send("something went wrong", id, data);
+      }
+    });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
 // app.use('/hello/2', (req, res) => {
 //     res.send('Hello from Hello Page 2!');
