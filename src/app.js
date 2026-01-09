@@ -24,8 +24,8 @@ app.post("/signup", async (req, res) => {
   try {
     await user.save();
     res.send("User Added Successfully ( : )");
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (err) {
+    res.status(400).send(err.message);
   }
 });
 
@@ -76,7 +76,9 @@ app.patch("/update/user", async (req, res) => {
   try {
     const id = req.body.id;
     const data = req.body.data;
-    await User.findByIdAndUpdate(id, data).then((responce) => {
+    await User.findByIdAndUpdate(id, data,{
+      runValidators:true
+    }).then((responce) => {
       if (responce) {
         res.send("User updated :>");
       } else {
@@ -84,7 +86,7 @@ app.patch("/update/user", async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).send(err.message);
   }
 });
 
