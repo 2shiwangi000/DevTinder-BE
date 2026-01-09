@@ -30,18 +30,17 @@ app.post("/signup", async (req, res) => {
 });
 
 app.get("/user", async (req, res) => {
-  // const emailId = req.body.emailId;
-  console.log(req.params,req.query.name)
-  // try {
-  //   const users = await User.find({ emailId: emailId });
-  //   if (users.length > 0) {
-  //     res.send(users);
-  //   } else {
-  //     res.status(400).send("user not found");
-  //   }
-  // } catch (err) {
-  //   res.status(400).send(err, "something went wrong");
-  // }
+  const emailId = req.body.emailId;
+  try {
+    const users = await User.find({ emailId: emailId });
+    if (users.length > 0) {
+      res.send(users);
+    } else {
+      res.status(400).send("user not found");
+    }
+  } catch (err) {
+    res.status(400).send(err, "something went wrong");
+  }
 });
 
 app.get("/feed/all", async (req, res) => {
@@ -72,12 +71,19 @@ app.delete("/delete", async (req, res) => {
   }
 });
 
-app.patch("/update/user", async (req, res) => {
+app.patch("/update/user/:id", async (req, res) => {
   try {
-    const id = req.body.id;
-    const data = req.body.data;
-    await User.findByIdAndUpdate(id, data,{
-      runValidators:true
+    const id = req.params.id;
+    const data = req.body;
+    const is_allowed = ["age", "gender", "hobbies", "photo"];
+    const isUpdateAllowed = Object.keys(data).every((i) =>
+      is_allowed.includes(i)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Not Allowed");
+    }
+    await User.findByIdAndUpdate(id, data, {
+      runValidators: true,
     }).then((responce) => {
       if (responce) {
         res.send("User updated :>");
