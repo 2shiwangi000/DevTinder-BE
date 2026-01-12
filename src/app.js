@@ -4,6 +4,10 @@ const connectDB = require("../src/config/database");
 
 const app = express();
 const User = require("./models/user");
+const { handleSignupValidation } = require("./utils/validations");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 connectDB()
   .then(() => {
@@ -18,14 +22,54 @@ connectDB()
   });
 
 app.use(express.json());
+app.use(cookieParser());
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.find({ emailId: emailId });
+    if (!user[0]) {
+      throw new Error("User doesnt exist with such mailid");
+    } else {
+      const passwordCorrect = await bcrypt.compare(password, user[0]?.password);
+      if (passwordCorrect) {
+        const token = await jwt.sign({ id: user[0]._id }, "DevShiwangi@2026");
+        res.cookie("token", token);
+        res.send("login successfull");
+      } else {
+        throw new Error("password or email not correct");
+      }
+    }
+  } catch (err) {
+    res.status(400).send(err?.message);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Unauthenticated User");
+    }
+    const decodedMsg = await jwt.verify(token, "DevShiwangi@2026");
+    const user = await User.findById(decodedMsg.id);
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
 
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
   try {
+    handleSignupValidation(req);
+    const { firstName, lastName, emailId, password } = req.body;
+    const enc_pwd = await bcrypt.hash(password, 10);
+    const user = new User({ firstName, lastName, emailId, password: enc_pwd });
     await user.save();
     res.send("User Added Successfully ( : )");
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(400).send("ERROR:" + err.message);
   }
 });
 
