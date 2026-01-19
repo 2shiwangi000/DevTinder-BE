@@ -11,4 +11,13 @@ function handleSignupValidation(req) {
   }
 }
 
-module.exports = {handleSignupValidation}
+function handleProfileEditValidation(req) {
+  const allowedFields = ["gender", "hobbies", "photo", "about", "age"];
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedFields.includes(field)
+  );
+  console.log(req);
+  if (isEditAllowed) return true;
+}
+
+module.exports = { handleSignupValidation, handleProfileEditValidation };

@@ -56,6 +56,11 @@ const userSchema = new mongoose.Schema(
       default:
         "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
     },
+    about: {
+      type: String,
+      maxLength: 500,
+      require: false,
+    },
   },
   {
     timestamps: true,
