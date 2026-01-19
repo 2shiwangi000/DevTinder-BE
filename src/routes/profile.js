@@ -2,6 +2,8 @@ const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const { handleProfileEditValidation } = require("../utils/validations");
 const profileRouter = express.Router();
+const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 // GET /profile — protected, returns `req.user`
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
@@ -34,6 +36,33 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     }
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+profileRouter.patch("/profile/password", userAuth, async (req, res) => {
+  try {
+    const { newPassword, oldPassword } = req.body;
+    const user = req.user;
+    const passwordCorrect = await user.passwordValidate(oldPassword);
+    if (passwordCorrect) {
+      if (!validator.isStrongPassword(newPassword)) {
+        throw new Error("please enter strong password");
+      } else {
+        const enc_pwd = await bcrypt.hash(newPassword, 10);
+        user.password = enc_pwd;
+        await user.save();
+        res.cookie("token", null, {
+          expires: new Date(Date.now()),
+        }).send("Password updated successfully.Please login again");
+      }
+    } else {
+      throw new Error("Password doesnt match with old password");
+    }
+  } catch (err) {
+    res.json({
+        message: err.message,
+        code: 500,
+      });
   }
 });
 

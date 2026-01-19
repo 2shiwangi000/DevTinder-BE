@@ -3,11 +3,7 @@ const express = require("express");
 const connectDB = require("../src/config/database");
 const app = express();
 
-const User = require("./models/user");
-const { handleSignupValidation } = require("./utils/validations");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const { userAuth } = require("./middlewares/auth");
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
