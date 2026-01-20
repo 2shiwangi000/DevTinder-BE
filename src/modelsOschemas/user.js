@@ -42,11 +42,15 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "lgbtq"].includes(value)) {
-          throw new Error("Gender not valid");
-        }
+      enum: {
+        values: ["male", "female", "lgbtq"],
+        message: `{VALUES} not gender type`,
       },
+      // validate(value) {
+      //   if (!["male", "female", "lgbtq"].includes(value)) {
+      //     throw new Error("Gender not valid");
+      //   }
+      // },
     },
     hobbies: {
       type: [String],

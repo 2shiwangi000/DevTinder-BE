@@ -1,5 +1,5 @@
 const express = require("express");
-const User = require("../models/user");
+const User = require("../modelsOschemas/user");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const { handleSignupValidation } = require("../../src/utils/validations");
@@ -16,9 +16,14 @@ authRouter.post("/signup", async (req, res) => {
     const enc_pwd = await bcrypt.hash(password, 10);
     const user = new User({ firstName, lastName, emailId, password: enc_pwd });
     await user.save();
-    res.send("User Added Successfully ( : )");
+    res.json({
+      code: 200,
+      message: "User Added Successfully ( : )",
+    });
   } catch (err) {
-    res.status(400).send("ERROR:" + err.message);
+    res.status(400).json({
+      message: "ERROR:" + err.message,
+    });
   }
 });
 
@@ -32,31 +37,39 @@ authRouter.post("/login", async (req, res) => {
     if (!user[0]) {
       // Avoid leaking which part failed (email vs password) in prod —
       // here we return a clear message for development purposes.
-      throw new Error("User doesnt exist with such mailid");
+      return res.status(400).json({
+        message: "User doesnt exist with such mailid",
+      });
+    }
+    // Verify password via model method
+    const passwordCorrect = await user[0].passwordValidate(password);
+    if (passwordCorrect) {
+      const token = await user[0].getJWTToken();
+      res.cookie("token", token).json({
+        message: "login successfull",
+      });
     } else {
-      // Verify password via model method
-      const passwordCorrect = await user[0].passwordValidate(password);
-      if (passwordCorrect) {
-        const token = await user[0].getJWTToken();
-        res.cookie("token", token);
-        res.send("login successfull");
-      } else {
-        throw new Error("password or email not correct");
-      }
+      return res.status(400).json({
+        message: "password or email not correct",
+      });
     }
   } catch (err) {
-    res.status(400).send(err?.message);
+    res.status(400).json({ message: err?.message });
   }
 });
 
 // POST /logout — logout
 authRouter.post("/logout", async (req, res) => {
   try {
-    res.cookie("token", null, {
-      expires: new Date(Date.now()),
-    }).send("logout successfull");
+    res
+      .cookie("token", null, {
+        expires: new Date(Date.now()),
+      })
+      .json({ code: 200, message: "logout successfull" });
   } catch (err) {
-    res.status(400).send("ERROR:" + err.message);
+    res.status(400).json({
+      message: "ERROR:" + err.message,
+    });
   }
 });
 

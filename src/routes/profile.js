@@ -9,9 +9,9 @@ const bcrypt = require("bcrypt");
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user;
-    res.send(user);
+    res.json({ code: 200, data: user });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ message: err.message });
   }
 });
 
@@ -19,23 +19,22 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
     if (!handleProfileEditValidation(req)) {
-      throw new Error("something went wrong");
-    } else {
-      const loggedInUser = req.user;
-      Object.keys(req.body).forEach(
-        (key) => (loggedInUser[key] = req.body[key])
-      );
-      await loggedInUser.save();
-      const userTosend = loggedInUser.toObject();
-      delete userTosend.password;
-      res.json({
-        message: `${req.user.firstName}'s profile updated successfully`,
-        code: 200,
-        data: userTosend,
+      return res.status(400).json({
+        message: "something went wrong",
       });
     }
+    const loggedInUser = req.user;
+    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
+    await loggedInUser.save();
+    const userTosend = loggedInUser.toObject();
+    delete userTosend.password;
+    res.json({
+      message: `${req.user.firstName}'s profile updated successfully`,
+      code: 200,
+      data: userTosend,
+    });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ message: "ERROR: " + err.message });
   }
 });
 
@@ -46,23 +45,31 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
     const passwordCorrect = await user.passwordValidate(oldPassword);
     if (passwordCorrect) {
       if (!validator.isStrongPassword(newPassword)) {
-        throw new Error("please enter strong password");
-      } else {
-        const enc_pwd = await bcrypt.hash(newPassword, 10);
-        user.password = enc_pwd;
-        await user.save();
-        res.cookie("token", null, {
-          expires: new Date(Date.now()),
-        }).send("Password updated successfully.Please login again");
+        return res.status(400).json({
+          message: "please enter strong password",
+        });
       }
+      const enc_pwd = await bcrypt.hash(newPassword, 10);
+      user.password = enc_pwd;
+      await user.save();
+      res
+        .cookie("token", null, {
+          expires: new Date(Date.now()),
+        })
+        .json({
+          code: 200,
+          message: "Password updated successfully.Please login again",
+        });
     } else {
-      throw new Error("Password doesnt match with old password");
+      res.status(400).json({
+        message: "Password doesnt match with old password",
+      });
     }
   } catch (err) {
     res.json({
-        message: err.message,
-        code: 500,
-      });
+      message: err.message,
+      code: 500,
+    });
   }
 });
 
