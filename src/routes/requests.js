@@ -16,11 +16,11 @@ requestRouter.post(
       const toUserId = req.params.userid;
       const status = req.params.status;
       const isUserOrNot = await User.findById(toUserId);
-    //   if (fromUserId.equals(toUserId)) {
-    //     return res.status(400).json({
-    //       message: `cant send request to own`,
-    //     });
-    //   }
+      //   if (fromUserId.equals(toUserId)) {
+      //     return res.status(400).json({
+      //       message: `cant send request to own`,
+      //     });
+      //   }
       if (!isUserOrNot) {
         return res.status(404).json({
           message: `user doesnt exist`,
@@ -61,6 +61,56 @@ requestRouter.post(
       });
     } catch (err) {
       console.log(err);
+      res.status(400).json({
+        message: err.message,
+      });
+    }
+  }
+);
+
+requestRouter.post(
+  "/request/review/:status/:reqID",
+  userAuth,
+  async (req, res) => {
+    try {
+      const user = req.user;
+      const loggedinId = user._id;
+      const reqId = req.params.reqID;
+      const allowedStatus = ["accepted", "rejected"];
+      const status = req.params.status;
+      const isUser = await User.findById(reqId);
+      if (!isUser) {
+        return res.status(404).json({
+          message: `user doesnt exist`,
+        });
+      }
+      if (!allowedStatus.includes(status)) {
+        return res.status(400).json({
+          message: `Invalid Status Type: ` + status,
+        });
+      }
+      const existingRequestOrNot = await connectionRequests.findOne({
+        fromUserId: reqId,
+        toUserId: loggedinId,
+      });
+
+      if (!existingRequestOrNot) {
+        return res.status(400).json({
+          message: `request doesn't exist`,
+        });
+      }
+      if (!existingRequestOrNot.status === "interested") {
+        return res.status(400).json({
+          message: `you cannot change status of ignored request`,
+        });
+      }
+      existingRequestOrNot.status = status;
+      existingRequestOrNot.save();
+      res.json({
+        message: `request ${status}`,
+        data: existingRequestOrNot,
+      });
+    } catch (err) {
       res.status(400).json({
         message: err.message,
       });

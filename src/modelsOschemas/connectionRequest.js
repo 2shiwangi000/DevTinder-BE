@@ -17,6 +17,7 @@ const connectionReqSchema = new mongoose.Schema(
         message: `{VALUE} is not a valid status`,
       },
       require: true,
+      trim: true,
     },
   },
   {
@@ -24,14 +25,14 @@ const connectionReqSchema = new mongoose.Schema(
   }
 );
 
-connectionReqSchema.index({fromUserId:1,toUserId:1});
+connectionReqSchema.index({ fromUserId: 1, toUserId: 1 });
 
 connectionReqSchema.pre("save", function () {
   const req = this;
   if (req.fromUserId.equals(req.toUserId)) {
     throw new Error("cant send request to own");
   }
-//   next();
+  //   next();
 });
 
 module.exports = mongoose.model("connectionRequest", connectionReqSchema);

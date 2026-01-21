@@ -2,7 +2,10 @@ const express = require("express");
 const User = require("../modelsOschemas/user");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
-const { handleSignupValidation } = require("../../src/utils/validations");
+const {
+  handleSignupValidation,
+} = require("../../src/utils/validations");
+const {capitalize} = require('../../src/utils/helpers')
 
 // POST /signup — validate, hash password, create user
 authRouter.post("/signup", async (req, res) => {
@@ -14,7 +17,12 @@ authRouter.post("/signup", async (req, res) => {
 
     // Hash password and save user
     const enc_pwd = await bcrypt.hash(password, 10);
-    const user = new User({ firstName, lastName, emailId, password: enc_pwd });
+    const user = new User({
+      firstName: capitalize(firstName),
+      lastName: capitalize(lastName),
+      emailId,
+      password: enc_pwd,
+    });
     await user.save();
     res.json({
       code: 200,
