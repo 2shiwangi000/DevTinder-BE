@@ -43,8 +43,13 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
           { status: "accepted", fromUserId: user._id },
         ],
       })
-      .populate("fromUserId", safe_connections);
-    let data = filteredConnections.map((item) => item.fromUserId);
+      .populate("fromUserId", safe_connections)
+      .populate("toUserId", safe_connections);
+    let data = filteredConnections.map((item) =>
+      item.fromUserId._id.toString() === user._id.toString()
+        ? item.toUserId
+        : item.fromUserId
+    );
     res.json({ data });
   } catch (err) {
     console.log(err);
