@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const connectionRequests = require("../modelsOschemas/connectionRequest");
+const User = require("../modelsOschemas/user");
 
 //get all the pending connection requests #status:interested
 
@@ -51,6 +52,68 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
         : item.fromUserId
     );
     res.json({ data });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+});
+
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    const limit = req.query.limit || 10;
+    const page = req.query.page || 1;
+    const skip = (page - 1) * limit;
+    const user = req.user;
+    const connectionRequest = await connectionRequests
+      .find({
+        $or: [
+          {
+            fromUserId: user._id,
+          },
+          {
+            toUserId: user._id,
+          },
+        ],
+      })
+      .select("fromUserId toUserId");
+    const hideUsersSet = new Set();
+    connectionRequest.forEach((req) => {
+      hideUsersSet.add(req.fromUserId.toString());
+      hideUsersSet.add(req.toUserId.toString());
+    });
+
+    const filter = {
+      $and: [
+        { _id: { $nin: Array.from(hideUsersSet) } },
+        { _id: { $ne: user._id } },
+      ],
+    };
+
+    const getTotal = await User.countDocuments(filter);
+    const paginatedData = await User.find(filter)
+      .find({
+        $and: [
+          { _id: { $nin: Array.from(hideUsersSet) } },
+          {
+            _id: { $ne: user._id },
+          },
+        ],
+      })
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      code: 200,
+      data: {
+        data: paginatedData,
+        page: Number(page),
+        limit: Number(limit),
+        total: getTotal,
+      },
+    });
   } catch (err) {
     console.log(err);
     res.status(400).json({
