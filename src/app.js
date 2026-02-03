@@ -2,6 +2,7 @@
 const express = require("express");
 const connectDB = require("../src/config/database");
 const app = express();
+var cors = require("cors");
 
 const cookieParser = require("cookie-parser");
 
@@ -27,6 +28,7 @@ connectDB()
 // Middleware: parse JSON and cookies
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
