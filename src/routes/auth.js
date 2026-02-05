@@ -2,10 +2,8 @@ const express = require("express");
 const User = require("../modelsOschemas/user");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
-const {
-  handleSignupValidation,
-} = require("../../src/utils/validations");
-const {capitalize} = require('../../src/utils/helpers')
+const { handleSignupValidation } = require("../../src/utils/validations");
+const { capitalize } = require("../../src/utils/helpers");
 
 // POST /signup — validate, hash password, create user
 authRouter.post("/signup", async (req, res) => {
@@ -54,7 +52,9 @@ authRouter.post("/login", async (req, res) => {
     if (passwordCorrect) {
       const token = await user[0].getJWTToken();
       res.cookie("token", token).json({
+        data: user[0],
         message: "login successfull",
+        code: 200,
       });
     } else {
       return res.status(400).json({
