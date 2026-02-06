@@ -51,11 +51,15 @@ authRouter.post("/login", async (req, res) => {
     const passwordCorrect = await user[0].passwordValidate(password);
     if (passwordCorrect) {
       const token = await user[0].getJWTToken();
-      res.cookie("token", token).json({
-        data: user[0],
-        message: "login successfull",
-        code: 200,
-      });
+      res
+        .cookie("token", token, {
+          expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+        })
+        .json({
+          data: user[0],
+          message: "login successfull",
+          code: 200,
+        });
     } else {
       return res.status(400).json({
         message: "password or email not correct",
