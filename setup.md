@@ -6,3 +6,5 @@
 //listen to a particular port
 //write request handlers for /
 //install nodemon and update scripts inside package.json
+
+//postgree db pwd - gAGYRsSYu7Hpr7Qc

@@ -57,8 +57,10 @@ const userSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      default:
-        "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+      // default: function () {
+      //   console.log(this.gender);
+      //   return DEFAULT_AVATARS[this.gender] || DEFAULT_AVATARS.male;
+      // },
     },
     about: {
       type: String,
@@ -68,7 +70,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Instance method: generate a JWT for this user
@@ -94,6 +96,23 @@ userSchema.methods.toJSON = function () {
   delete obj.__v;
   return obj;
 };
+
+userSchema.pre("save", function () {
+  if (!this.photo) {
+    const DEFAULT_AVATARS = {
+      male: "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_a1d9hya1d9hya1d9.png",
+      female:
+        "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_7bqrz27bqrz27bqr.png",
+      lgbtq:
+        "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_94lrb194lrb194lr.png",
+      default:
+        "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_l3x1t8l3x1t8l3x1.png",
+    };
+
+    this.photo = DEFAULT_AVATARS[this.gender] || DEFAULT_AVATARS.default;
+  }
+  // next();
+});
 
 // Export Mongoose model
 module.exports = mongoose.model("User", userSchema);
