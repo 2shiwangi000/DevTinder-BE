@@ -25,7 +25,23 @@ userRouter.get("/user/requests", userAuth, async (req, res) => {
         toUserId: loggedinId,
       })
       .populate("fromUserId", safe_connections);
-    res.send(filteredConnections);
+    res.json({ data: filteredConnections });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+});
+
+userRouter.get("/user/requests/count", userAuth, async (req, res) => {
+  try {
+    const loggedinId = req.user._id;
+    const total = await connectionRequests.countDocuments({
+      status: "interested",
+      toUserId: loggedinId,
+    });
+    res.json({ count: total, code: 200 });
   } catch (err) {
     console.log(err);
     res.status(400).json({
@@ -49,7 +65,7 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
     let data = filteredConnections.map((item) =>
       item.fromUserId._id.toString() === user._id.toString()
         ? item.toUserId
-        : item.fromUserId
+        : item.fromUserId,
     );
     res.json({ data });
   } catch (err) {
