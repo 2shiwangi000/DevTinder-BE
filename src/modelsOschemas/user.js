@@ -98,19 +98,19 @@ userSchema.methods.toJSON = function () {
 };
 
 userSchema.pre("save", function () {
-  if (!this.photo) {
-    const DEFAULT_AVATARS = {
-      male: "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_a1d9hya1d9hya1d9.png",
-      female:
-        "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_7bqrz27bqrz27bqr.png",
-      lgbtq:
-        "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_94lrb194lrb194lr.png",
-      default:
-        "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_l3x1t8l3x1t8l3x1.png",
-    };
+  // if (!this.photo) {
+  const DEFAULT_AVATARS = {
+    male: "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_a1d9hya1d9hya1d9.png",
+    female:
+      "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_7bqrz27bqrz27bqr.png",
+    lgbtq:
+      "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_94lrb194lrb194lr.png",
+    default:
+      "https://dqysqvftxdrupwraetvt.supabase.co/storage/v1/object/public/DevTinder/Gemini_Generated_Image_l3x1t8l3x1t8l3x1.png",
+  };
 
-    this.photo = DEFAULT_AVATARS[this.gender] || DEFAULT_AVATARS.default;
-  }
+  this.photo = DEFAULT_AVATARS[this.gender] || DEFAULT_AVATARS.default;
+  // }
   // next();
 });
 
