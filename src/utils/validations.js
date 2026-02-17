@@ -16,7 +16,7 @@ function handleProfileEditValidation(req) {
   const isEditAllowed = Object.keys(req.body).every((field) =>
     allowedFields.includes(field)
   );
-  if (isEditAllowed) return true;
+  if (isEditAllowed) return true; 
 }
 
 module.exports = { handleSignupValidation, handleProfileEditValidation };
