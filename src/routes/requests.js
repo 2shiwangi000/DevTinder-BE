@@ -11,7 +11,7 @@ requestRouter.post(
   async (req, res) => {
     try {
       const allowedStatus = ["interested", "ignored"];
-      const user = req.user;
+      const user = req.user; 
       const fromUserId = user._id;
       const toUserId = req.params.userid;
       const status = req.params.status;
