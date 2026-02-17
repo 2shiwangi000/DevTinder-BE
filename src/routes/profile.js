@@ -69,7 +69,7 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
     res.json({
       message: err.message,
       code: 500,
-    });
+    }); 
   }
 });
 
