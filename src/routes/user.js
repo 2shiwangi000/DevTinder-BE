@@ -43,7 +43,7 @@ userRouter.get("/user/requests/count", userAuth, async (req, res) => {
     });
     res.json({ count: total, code: 200 });
   } catch (err) {
-    console.log(err);
+    console.log(err); 
     res.status(400).json({
       message: err.message,
     });
