@@ -2,6 +2,12 @@ const { SESClient } = require("@aws-sdk/client-ses");
 
 const REGION = "us-east-1";
 
-const sesClient = new SESClient({ region: REGION });
+const sesClient = new SESClient({
+  region: REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+  },
+});
 
-export { sesClient };
+module.exports = { sesClient };
