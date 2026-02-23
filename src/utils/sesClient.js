@@ -1,6 +1,6 @@
 const { SESClient } = require("@aws-sdk/client-ses");
 
-const REGION = "us-east-1";
+const REGION = process.env.SES_REGION;
 
 const sesClient = new SESClient({
   region: REGION,

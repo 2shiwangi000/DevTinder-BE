@@ -3,9 +3,9 @@ const express = require("express");
 const connectDB = require("../src/config/database");
 const app = express();
 var cors = require("cors");
-
 const cookieParser = require("cookie-parser");
 
+console.log(process.env)
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/requests");

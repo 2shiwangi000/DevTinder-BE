@@ -3,7 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 const requestRouter = express.Router();
 const connectionRequests = require("../modelsOschemas/connectionRequest");
 const User = require("../modelsOschemas/user");
-
+const sendEmail = require("../utils/sendEmail");
 // POST /sendConectionReq — protected example route
 requestRouter.post(
   "/request/send/:status/:userid",
@@ -54,6 +54,10 @@ requestRouter.post(
         status,
       });
       const data = await connectionRequest.save();
+
+      const emailRes = await sendEmail.run();
+
+      console.log(emailRes)
       res.json({
         message: `request sent`,
         code: 200,
