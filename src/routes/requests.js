@@ -11,7 +11,7 @@ requestRouter.post(
   async (req, res) => {
     try {
       const allowedStatus = ["interested", "ignored"];
-      const user = req.user; 
+      const user = req.user;
       const fromUserId = user._id;
       const toUserId = req.params.userid;
       const status = req.params.status;
@@ -55,9 +55,12 @@ requestRouter.post(
       });
       const data = await connectionRequest.save();
 
-      const emailRes = await sendEmail.run();
+      const emailRes = await sendEmail.run(
+        "new connection request",
+        "hey you got a new connection request.check you request section #devtalk",
+      );
 
-      console.log(emailRes)
+      console.log(emailRes);
       res.json({
         message: `request sent`,
         code: 200,
@@ -69,7 +72,7 @@ requestRouter.post(
         message: err.message,
       });
     }
-  }
+  },
 );
 
 requestRouter.post(
@@ -119,7 +122,7 @@ requestRouter.post(
         message: err.message,
       });
     }
-  }
+  },
 );
 
 module.exports = requestRouter;

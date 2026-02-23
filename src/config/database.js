@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   // NOTE: connection string is hard-coded for development. Move to env var.
   await mongoose.connect(
-    "mongodb+srv://2shiwangi000_db_user:yUhnahpTtsPZ2sQf@cluster0.f1pczgi.mongodb.net/devTinder"
+    process.env.DB_CONNECTION_SECRET
   );
 };
 

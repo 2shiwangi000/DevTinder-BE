@@ -8,7 +8,7 @@ const userAuth = async (req, res, next) => {
     if (!token) throw new Error("Unauthenticated User");
 
     // verify token and extract user id (dev secret hard-coded)
-    const decodedData = jwt.verify(token, "DevShiwangi@2026"); 
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY); 
     const { id } = decodedData;
 
     // attach user document to request for downstream handlers

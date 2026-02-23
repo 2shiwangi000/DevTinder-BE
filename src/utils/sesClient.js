@@ -1,11 +1,11 @@
 const { SESClient } = require("@aws-sdk/client-ses");
 
-const REGION = process.env.SES_REGION;
+const REGION =  process.env.SES_REGION;
 
 const sesClient = new SESClient({
   region: REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
+    accessKeyId:  process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_KEY,
   },
 });

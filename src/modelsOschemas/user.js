@@ -77,8 +77,8 @@ const userSchema = new mongoose.Schema(
 // NOTE: secret is hard-coded for dev; replace with env var in production
 userSchema.methods.getJWTToken = async function () {
   const user = this;
-  const token = await jwt.sign({ id: user._id }, "DevShiwangi@2026", {
-    expiresIn: "1d",
+  const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.TOKEN_EXPIRY_TIME,
   });
   return token;
 };
