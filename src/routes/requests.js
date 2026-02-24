@@ -56,8 +56,9 @@ requestRouter.post(
       const data = await connectionRequest.save();
 
       const emailRes = await sendEmail.run(
-        "new connection request",
-        "hey you got a new connection request.check you request section #devtalk",
+        "New connection request on DevTalk 🚀",
+        user.firstName,
+        isUserOrNot.emailId,
       );
 
       console.log(emailRes);

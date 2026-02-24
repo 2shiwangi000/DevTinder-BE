@@ -1,4 +1,5 @@
 // Basic Express server for DevTinder: DB connect, middleware, routes
+require("dotenv").config();
 const express = require("express");
 const connectDB = require("../src/config/database");
 const app = express();
@@ -8,7 +9,6 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/requests");
 const userRouter = require("./routes/user");
-require("dotenv").config();
 
 // Connect to DB, then start server
 connectDB()
