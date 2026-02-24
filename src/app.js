@@ -1,5 +1,6 @@
 // Basic Express server for DevTinder: DB connect, middleware, routes
 require("dotenv").config();
+require("./utils/cronjob");
 const express = require("express");
 const connectDB = require("../src/config/database");
 const app = express();
