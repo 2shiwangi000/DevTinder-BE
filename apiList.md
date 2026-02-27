@@ -22,5 +22,5 @@ GET /user/requests
 GET /user/feed - gets profiles of other users on platform
 
 
-<!-- status----ignore,interested,accepted,rejected -->
+<!-- status----ignore,interested,accepted,rejected -->  
  
