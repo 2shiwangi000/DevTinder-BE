@@ -12,7 +12,7 @@ const requestRouter = require("./routes/requests");
 const userRouter = require("./routes/user");
 
 // Connect to DB, then start server
-connectDB()
+connectDB() 
   .then(() => {
     console.log("DB connected successfully");
     // Start Express server on port 4000
