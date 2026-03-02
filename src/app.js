@@ -10,9 +10,10 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/requests");
 const userRouter = require("./routes/user");
+const paymentRouter = require("./routes/payment");
 
 // Connect to DB, then start server
-connectDB() 
+connectDB()
   .then(() => {
     console.log("DB connected successfully");
     // Start Express server on port 4000
@@ -39,3 +40,4 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", paymentRouter);
