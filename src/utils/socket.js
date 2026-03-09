@@ -7,7 +7,13 @@ const initializeSocket = (server) => {
     },
   });
 
-  io.on("connection", (socket) => {});
+  io.on("connection", (socket) => {
+    socket.on("joinChat", () => {});
+
+    socket.on("sendMessage", () => {});
+
+    socket.on("disconnect", () => {});
+  });
 };
 
 module.exports = initializeSocket;
