@@ -11,13 +11,19 @@ const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/requests");
 const userRouter = require("./routes/user");
 const paymentRouter = require("./routes/payment");
+const http = require("http");
+const initializeSocket = require("./utils/socket");
+
+const server = http.createServer(app);
+
+initializeSocket(server);
 
 // Connect to DB, then start server
 connectDB()
   .then(() => {
     console.log("DB connected successfully");
     // Start Express server on port 4000
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log("server is running on port 4000");
     });
   })
