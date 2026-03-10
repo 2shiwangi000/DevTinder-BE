@@ -8,9 +8,23 @@ const initializeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    socket.on("joinChat", () => {});
+    socket.on("joinChat", ({ firstName, userID, id }) => {
+      const room = [userID, id].sort().join("_");
 
-    socket.on("sendMessage", () => {});
+      console.log(firstName + ":" + "Room joining ..." + room);
+      socket.join(room);
+    });
+
+    socket.on("sendMessage", ({ firstName, userId, id, message }) => {
+      const roomId = [userId, id].sort().join("_");
+      console.log(firstName + "-" + message);
+     try{
+       io.to(roomId).emit("messageReceived", { firstName, message });
+     }
+     catch(err){
+      console.log(err);
+     }
+    });
 
     socket.on("disconnect", () => {});
   });
