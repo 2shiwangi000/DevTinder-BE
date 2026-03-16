@@ -2,6 +2,8 @@ const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../modelsOschemas/chat");
 
+const onlineUsers = new Map();
+
 const getSecretRoomId = ({ userId, id }) => {
   return crypto
     .createHash("sha256")
@@ -22,6 +24,10 @@ const initializeSocket = (server) => {
 
       console.log(firstName + " Joining Room :" + roomId);
       socket.join(roomId);
+      // store online user
+      onlineUsers.set(userId, socket.id);
+      // broadcast user online
+      io.emit("onlineUser", userId);
     });
 
     socket.on("sendMessage", async ({ firstName, userId, id, message }) => {
@@ -57,7 +63,20 @@ const initializeSocket = (server) => {
       }
     });
 
-    socket.on("disconnect", () => {});
+    socket.on("checkUserOnline", ({ id }, callback) => {
+      const isOnline = onlineUsers.has(id);
+      callback(isOnline);
+    });
+
+    socket.on("disconnect", () => {
+      for (let [userId, socketId] of onlineUsers) {
+        if (socketId === socket.id) {
+          onlineUsers.delete(userId);
+          io.emit("offlineUser", userId);
+          break;
+        }
+      }
+    });
   });
 };
 
