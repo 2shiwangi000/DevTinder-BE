@@ -8,7 +8,7 @@ chatRouter.get("/chat/:id", userAuth, async (req, res) => {
   const { id } = req.params;
   const userId = req.user._id;
 
-  try {
+  try {    
     let chat = await Chat.findOne({
       participants: {
         $all: [userId, id],

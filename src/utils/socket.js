@@ -1,6 +1,7 @@
 const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../modelsOschemas/chat");
+const connectionRequests = require("../modelsOschemas/connectionRequest");
 
 const onlineUsers = new Map();
 
@@ -32,6 +33,13 @@ const initializeSocket = (server) => {
 
     socket.on("sendMessage", async ({ firstName, userId, id, message }) => {
       try {
+        const isConnectedOrNot = await connectionRequests.find({
+          $or: [
+            { status: "accepted", toUserId: id },
+            { status: "accepted", fromUserId: id },
+          ],
+        });
+        if (!isConnectedOrNot) return;
         const roomId = getSecretRoomId(userId, id);
         console.log(firstName + "-" + message);
         let chat = await Chat.findOne({
