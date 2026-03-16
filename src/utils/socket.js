@@ -77,6 +77,8 @@ const initializeSocket = (server) => {
         }
       }
     });
+
+    console.log(onlineUsers);
   });
 };
 
