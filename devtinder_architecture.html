@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevTinder Architecture</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f7f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      margin: 0;
+      color: #1a1a18;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0 0 8px;
+      color: #1a1a18;
+    }
+    p {
+      font-size: 14px;
+      color: #73726c;
+      margin: 0 0 32px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      padding: 32px;
+      max-width: 760px;
+      width: 100%;
+    }
+    svg text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    /* Color ramps */
+    .c-purple rect, .c-purple circle, .c-purple ellipse { fill: #EEEDFE; stroke: #534AB7; }
+    .c-purple text { fill: #3C3489; }
+    .c-teal rect, .c-teal circle, .c-teal ellipse { fill: #E1F5EE; stroke: #0F6E56; }
+    .c-teal text { fill: #085041; }
+    .c-blue rect, .c-blue circle, .c-blue ellipse { fill: #E6F1FB; stroke: #185FA5; }
+    .c-blue text { fill: #0C447C; }
+    .c-coral rect, .c-coral circle, .c-coral ellipse { fill: #FAECE7; stroke: #993C1D; }
+    .c-coral text { fill: #712B13; }
+    .c-green rect, .c-green circle, .c-green ellipse { fill: #EAF3DE; stroke: #3B6D11; }
+    .c-green text { fill: #27500A; }
+    .c-amber rect, .c-amber circle, .c-amber ellipse { fill: #FAEEDA; stroke: #854F0B; }
+    .c-amber text { fill: #633806; }
+    .c-gray rect, .c-gray circle, .c-gray ellipse { fill: #F1EFE8; stroke: #5F5E5A; }
+    .c-gray text { fill: #444441; }
+
+    .t  { font-size: 14px; font-weight: 400; fill: #1a1a18; }
+    .ts { font-size: 12px; font-weight: 400; fill: #73726c; }
+    .th { font-size: 14px; font-weight: 500; fill: #1a1a18; }
+
+    .arr { stroke: #888780; stroke-width: 1.5; fill: none; }
+    .leader { stroke: #888780; stroke-width: 0.5; fill: none; stroke-dasharray: 4 3; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a18; color: #e2e0d6; }
+      .card { background: #242422; border-color: rgba(255,255,255,0.1); }
+      .c-purple rect, .c-purple circle, .c-purple ellipse { fill: #3C3489; stroke: #AFA9EC; }
+      .c-purple text { fill: #CECBF6; }
+      .c-teal rect, .c-teal circle, .c-teal ellipse { fill: #085041; stroke: #5DCAA5; }
+      .c-teal text { fill: #9FE1CB; }
+      .c-blue rect, .c-blue circle, .c-blue ellipse { fill: #0C447C; stroke: #85B7EB; }
+      .c-blue text { fill: #B5D4F4; }
+      .c-coral rect, .c-coral circle, .c-coral ellipse { fill: #712B13; stroke: #F0997B; }
+      .c-coral text { fill: #F5C4B3; }
+      .c-green rect, .c-green circle, .c-green ellipse { fill: #27500A; stroke: #97C459; }
+      .c-green text { fill: #C0DD97; }
+      .c-amber rect, .c-amber circle, .c-amber ellipse { fill: #633806; stroke: #EF9F27; }
+      .c-amber text { fill: #FAC775; }
+      .c-gray rect, .c-gray circle, .c-gray ellipse { fill: #444441; stroke: #B4B2A9; }
+      .c-gray text { fill: #D3D1C7; }
+      .t  { fill: #e2e0d6; }
+      .ts { fill: #9c9a92; }
+      .th { fill: #e2e0d6; }
+      .arr { stroke: #9c9a92; }
+      h1 { color: #e2e0d6; }
+      p { color: #9c9a92; }
+    }
+  </style>
+</head>
+<body>
+  <h1>DevTinder — Backend Architecture</h1>
+  <p>Request flow from client through Express, middleware, routes, models, and MongoDB</p>
+  <div class="card">
+    <svg width="100%" viewBox="0 0 680 620">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Client -->
+      <g class="c-gray">
+        <rect x="260" y="20" width="160" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">Frontend / Client</text>
+      </g>
+
+      <line x1="340" y1="64" x2="340" y2="94" class="arr" marker-end="url(#arrow)"/>
+      <text class="ts" x="352" y="83" dominant-baseline="central">HTTP + WebSocket</text>
+
+      <!-- app.js -->
+      <g class="c-purple">
+        <rect x="220" y="94" width="240" height="56" rx="8" stroke-width="0.5"/>
+        <text class="th" x="340" y="115" text-anchor="middle" dominant-baseline="central">app.js</text>
+        <text class="ts" x="340" y="134" text-anchor="middle" dominant-baseline="central">Express server + Socket.IO</text>
+      </g>
+
+      <line x1="340" y1="150" x2="340" y2="180" class="arr" marker-end="url(#arrow)"/>
+
+      <!-- Middleware -->
+      <g class="c-teal">
+        <rect x="220" y="180" width="240" height="56" rx="8" stroke-width="0.5"/>
+        <text class="th" x="340" y="201" text-anchor="middle" dominant-baseline="central">auth middleware</text>
+        <text class="ts" x="340" y="220" text-anchor="middle" dominant-baseline="central">Verifies JWT from cookie</text>
+      </g>
+
+      <!-- Lines from middleware to routes -->
+      <line x1="280" y1="236" x2="80"  y2="270" class="arr" marker-end="url(#arrow)" stroke="#888780"/>
+      <line x1="305" y1="236" x2="198" y2="270" class="arr" marker-end="url(#arrow)" stroke="#888780"/>
+      <line x1="330" y1="236" x2="316" y2="270" class="arr" marker-end="url(#arrow)" stroke="#888780"/>
+      <line x1="355" y1="236" x2="434" y2="270" class="arr" marker-end="url(#arrow)" stroke="#888780"/>
+      <line x1="390" y1="236" x2="542" y2="270" class="arr" marker-end="url(#arrow)" stroke="#888780"/>
+      <line x1="430" y1="236" x2="636" y2="270" class="arr" marker-end="url(#arrow)" stroke="#888780"/>
+
+      <!-- Routes -->
+      <g class="c-blue">
+        <rect x="30" y="270" width="100" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="80" y="292" text-anchor="middle" dominant-baseline="central">auth</text>
+      </g>
+      <g class="c-blue">
+        <rect x="148" y="270" width="100" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="198" y="292" text-anchor="middle" dominant-baseline="central">profile</text>
+      </g>
+      <g class="c-blue">
+        <rect x="266" y="270" width="100" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="316" y="292" text-anchor="middle" dominant-baseline="central">requests</text>
+      </g>
+      <g class="c-blue">
+        <rect x="384" y="270" width="100" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="434" y="292" text-anchor="middle" dominant-baseline="central">user</text>
+      </g>
+      <g class="c-blue">
+        <rect x="502" y="270" width="80" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="542" y="292" text-anchor="middle" dominant-baseline="central">chat</text>
+      </g>
+      <g class="c-blue">
+        <rect x="600" y="270" width="72" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="636" y="292" text-anchor="middle" dominant-baseline="central">payment</text>
+      </g>
+
+      <line x1="340" y1="314" x2="340" y2="360" class="arr" marker-end="url(#arrow)"/>
+      <text class="ts" x="340" y="354" text-anchor="middle">Mongoose Models (MongoDB schemas)</text>
+
+      <!-- Models -->
+      <g class="c-coral">
+        <rect x="40" y="370" width="120" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="100" y="392" text-anchor="middle" dominant-baseline="central">User</text>
+      </g>
+      <g class="c-coral">
+        <rect x="180" y="370" width="140" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="250" y="392" text-anchor="middle" dominant-baseline="central">ConnectionRequest</text>
+      </g>
+      <g class="c-coral">
+        <rect x="340" y="370" width="90" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="385" y="392" text-anchor="middle" dominant-baseline="central">Chat</text>
+      </g>
+      <g class="c-coral">
+        <rect x="450" y="370" width="100" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="500" y="392" text-anchor="middle" dominant-baseline="central">Payment</text>
+      </g>
+
+      <line x1="340" y1="414" x2="340" y2="450" class="arr" marker-end="url(#arrow)"/>
+
+      <!-- MongoDB -->
+      <g class="c-green">
+        <rect x="220" y="450" width="240" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="340" y="472" text-anchor="middle" dominant-baseline="central">MongoDB</text>
+      </g>
+
+      <!-- Utils -->
+      <g class="c-amber">
+        <rect x="20" y="490" width="150" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="95" y="505" text-anchor="middle" dominant-baseline="central">Utils</text>
+        <text class="ts" x="95" y="523" text-anchor="middle" dominant-baseline="central">email, cron, socket</text>
+      </g>
+      <line x1="340" y1="472" x2="170" y2="512" class="leader"/>
+
+      <!-- AWS SES -->
+      <g class="c-amber">
+        <rect x="510" y="490" width="150" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="585" y="505" text-anchor="middle" dominant-baseline="central">AWS SES</text>
+        <text class="ts" x="585" y="523" text-anchor="middle" dominant-baseline="central">Sends emails</text>
+      </g>
+      <line x1="170" y1="512" x2="510" y2="512" class="leader" marker-end="url(#arrow)"/>
+
+      <!-- Cron -->
+      <g class="c-amber">
+        <rect x="20" y="560" width="150" height="44" rx="8" stroke-width="0.5"/>
+        <text class="th" x="95" y="575" text-anchor="middle" dominant-baseline="central">node-cron</text>
+        <text class="ts" x="95" y="593" text-anchor="middle" dominant-baseline="central">Daily 8am email job</text>
+      </g>
+      <line x1="95" y1="534" x2="95" y2="560" class="arr" marker-end="url(#arrow)"/>
+    </svg>
+  </div>
+</body>
+</html>
