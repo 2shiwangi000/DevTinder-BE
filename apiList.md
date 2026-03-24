@@ -5,7 +5,7 @@ POST /signup
 POST /login
 POST /logout
 
-## profileRouter
+## profileRouter   
 GET /profile/view
 PATCH /profile/edit
 PATCH /profile/password
